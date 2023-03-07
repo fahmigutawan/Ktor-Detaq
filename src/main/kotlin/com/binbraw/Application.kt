@@ -4,8 +4,8 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import com.binbraw.configuration.*
-import com.binbraw.data.api.ApiInjection
-import com.binbraw.data.dao.DaoInjection
+import com.binbraw.di.ApiInjection
+import com.binbraw.di.DaoInjection
 import com.binbraw.data.database.DatabaseProvider
 import com.binbraw.util.getConfig
 import com.typesafe.config.ConfigFactory
