@@ -5,5 +5,9 @@ data class Config(
     val port:Int,
     val jdbc_url:String,
     val db_username:String,
-    val db_password:String
+    val db_password:String,
+    val jwt_secret:String,
+    val jwt_issuer:String,
+    val jwt_audience:String,
+    val jwt_realm:String
 )

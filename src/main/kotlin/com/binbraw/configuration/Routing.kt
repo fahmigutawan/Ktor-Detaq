@@ -1,15 +1,22 @@
 package com.binbraw.configuration
 
-import com.binbraw.data.api.user.UserApi
 import io.ktor.server.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.application.*
-import org.koin.ktor.ext.inject
+import io.ktor.server.auth.*
 
-fun Application.configureRouting() {
+fun Application.configureRegularRouting() {
     routing {
         get("/") {
             call.respondText("Hello World!")
+        }
+    }
+}
+
+fun Application.configureAuthorizedRouting(){
+    routing {
+        authenticate("jwt-auth") {
+
         }
     }
 }

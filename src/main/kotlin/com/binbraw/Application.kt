@@ -48,5 +48,7 @@ fun Application.configurations() {
     configureSerialization()
     configureMonitoring()
     configureHTTP()
-    configureRouting()
+    configureAuthorization()
+    configureRegularRouting()
+    configureAuthorizedRouting()
 }
