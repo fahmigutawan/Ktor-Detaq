@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+    var exposed_version = "0.41.1"
     var koin_version = "3.2.0"
 
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
@@ -46,4 +47,9 @@ dependencies {
 
     //Koin DI
     implementation("io.insert-koin:koin-ktor:$koin_version")
+
+    //Exposed
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
 }

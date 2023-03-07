@@ -15,16 +15,14 @@ fun getConfig(
         Config(
             host = System.getenv("host"),
             port = Integer.parseInt(System.getenv("port")),
-            supabaseUrl = System.getenv("supabase_url"),
-            supabaseKey = System.getenv("supabase_key")
+            jdbc_url = System.getenv("jdbc_url")
         )
     }catch (e:Exception){
         print(e.stackTrace)
         Config(
             host = defaultHoconEnv.property("host").getString(),
             port = Integer.parseInt(defaultHoconEnv.property("port").getString()),
-            supabaseUrl = defaultHoconEnv.property("supabase_url").getString(),
-            supabaseKey = defaultHoconEnv.property("supabase_key").getString()
+            jdbc_url = defaultHoconEnv.property("jdbc_url").getString()
         )
     }
 }
