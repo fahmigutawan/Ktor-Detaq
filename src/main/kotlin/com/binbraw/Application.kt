@@ -4,6 +4,8 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import com.binbraw.configuration.*
+import com.binbraw.data.api.ApiInjection
+import com.binbraw.data.database.DatabaseProvider
 import com.binbraw.util.getConfig
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.config.*
@@ -20,13 +22,18 @@ fun main() {
         Netty,
         port = config.port,
         host = config.host
-    ){
-        module{
-            install(Koin){
-                module {
-                    single{ config }
-                }
+    ) {
+        module {
+            install(Koin) {
+                modules(
+                    module {
+                        single { config }
+                        single { DatabaseProvider() }
+                    },
+                    ApiInjection.provide,
+                )
                 configurations()
+
             }
         }
     }.start(wait = true)
