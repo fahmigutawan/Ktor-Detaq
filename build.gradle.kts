@@ -24,7 +24,8 @@ repositories {
 dependencies {
     var exposed_version = "0.41.1"
     var koin_version = "3.2.0"
-    var hikari_version = "5.0.1"
+    var h2_version = "2.1.214"
+    var postgresql_version = "42.2.2"
 
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-client-core-jvm:$ktor_version")
@@ -54,6 +55,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
 
-    //Hikari
-    implementation("com.zaxxer:HikariCP:$hikari_version")
+    //H2 Database
+    implementation("com.h2database:h2:$h2_version")
+
+    //JDBC
+    implementation("org.postgresql:postgresql:$postgresql_version")
 }

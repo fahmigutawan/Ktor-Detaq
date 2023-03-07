@@ -5,11 +5,13 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import com.binbraw.configuration.*
 import com.binbraw.data.api.ApiInjection
+import com.binbraw.data.dao.DaoInjection
 import com.binbraw.data.database.DatabaseProvider
 import com.binbraw.util.getConfig
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.config.*
 import org.koin.dsl.module
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 
 fun main() {
@@ -30,16 +32,19 @@ fun main() {
                         single { config }
                         single { DatabaseProvider() }
                     },
+                    DaoInjection.provide,
                     ApiInjection.provide,
                 )
-                configurations()
-
             }
+            configurations()
         }
     }.start(wait = true)
 }
 
 fun Application.configurations() {
+    val databaseProvider by inject<DatabaseProvider>()
+    databaseProvider.init()
+
     configureSerialization()
     configureMonitoring()
     configureHTTP()

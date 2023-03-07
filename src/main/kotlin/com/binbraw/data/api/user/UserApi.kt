@@ -1,4 +1,4 @@
-package com.binbraw.data.api
+package com.binbraw.data.api.user
 
 import org.koin.core.component.KoinComponent
 
