@@ -21,19 +21,21 @@ fun getConfig(
             jwt_audience = System.getenv("JWT_AUDIENCE"),
             jwt_issuer = System.getenv("JWT_ISSUER"),
             jwt_realm = System.getenv("JWT_REALM"),
-            jwt_secret = System.getenv("JWT_SECRET")
+            jwt_secret = System.getenv("JWT_SECRET"),
+            pw_salt = System.getenv("PW_SALT")
         )
     }catch (e:Exception){
         Config(
-            host = defaultHoconEnv.property("host").getString(),
-            port = Integer.parseInt(defaultHoconEnv.property("port").getString()),
-            jdbc_url = defaultHoconEnv.property("jdbc_url").getString(),
-            db_username = defaultHoconEnv.property("db_username").getString(),
-            db_password = defaultHoconEnv.property("db_password").getString(),
+            host = defaultHoconEnv.property("HOST").getString(),
+            port = Integer.parseInt(defaultHoconEnv.property("PORT").getString()),
+            jdbc_url = defaultHoconEnv.property("JDBC_URL").getString(),
+            db_username = defaultHoconEnv.property("DB_USERNAME").getString(),
+            db_password = defaultHoconEnv.property("DB_PASSWORD").getString(),
             jwt_audience = defaultHoconEnv.property("JWT_AUDIENCE").getString(),
             jwt_issuer = defaultHoconEnv.property("JWT_ISSUER").getString(),
             jwt_realm = defaultHoconEnv.property("JWT_REALM").getString(),
-            jwt_secret = defaultHoconEnv.property("JWT_SECRET").getString()
+            jwt_secret = defaultHoconEnv.property("JWT_SECRET").getString(),
+            pw_salt = defaultHoconEnv.property("PW_SALT").getString()
         )
     }
 }

@@ -5,8 +5,9 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import com.binbraw.configuration.*
 import com.binbraw.di.ApiInjection
-import com.binbraw.di.DaoInjection
+import com.binbraw.di.TableInjection
 import com.binbraw.data.database.DatabaseProvider
+import com.binbraw.util.PasswordManager
 import com.binbraw.util.getConfig
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.config.*
@@ -31,8 +32,9 @@ fun main() {
                     module {
                         single { config }
                         single { DatabaseProvider() }
+                        single { PasswordManager }
                     },
-                    DaoInjection.provide,
+                    TableInjection.provide,
                     ApiInjection.provide,
                 )
             }

@@ -9,5 +9,6 @@ data class Config(
     val jwt_secret:String,
     val jwt_issuer:String,
     val jwt_audience:String,
-    val jwt_realm:String
+    val jwt_realm:String,
+    val pw_salt:String
 )

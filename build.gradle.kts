@@ -40,8 +40,8 @@ dependencies {
     implementation("io.ktor:ktor-server-cors-jvm:$ktor_version")
 
     //Json
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-gson:$ktor_version")
 
     //Authentication
     implementation("io.ktor:ktor-server-auth-jvm:$ktor_version")
