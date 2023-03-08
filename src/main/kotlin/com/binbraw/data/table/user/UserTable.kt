@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object UserTable : Table("user") {
     val uid = uuid("uid").autoGenerate()
     val email = varchar("email", 255)
-    val password = varchar("password", 255)
+    val password = varchar("password", 512)
     val name = varchar("name", 255)
     val role_id = integer("role_id")
     val created_at = varchar("created_at", 255)

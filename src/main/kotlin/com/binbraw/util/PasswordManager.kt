@@ -5,19 +5,23 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.security.MessageDigest
 
-object PasswordManager:KoinComponent {
+object PasswordManager : KoinComponent {
     val config by inject<Config>()
-    fun hashPassword(password:String):String{
-        val bytes = (config.pw_salt + password + config.pw_salt).toByteArray(Charsets.UTF_8)
+    fun hashPassword(password: String): String {
+        val bytes = password.toByteArray(Charsets.UTF_8)
+        val saltBytes = config.pw_salt.toByteArray(Charsets.UTF_8)
         val md = MessageDigest.getInstance("SHA-512")
         val digest = md.digest(bytes)
-        return hex(digest)
+        val saltDigest = md.digest(saltBytes)
+        return (hex(saltDigest) + hex(digest))
     }
 
-    fun checkPassword(password: String, hashedPassword:String):Boolean{
-        val bytes = (config.pw_salt + password + config.pw_salt).toByteArray(Charsets.UTF_8)
+    fun checkPassword(password: String, hashedPassword: String): Boolean {
+        val bytes = password.toByteArray(Charsets.UTF_8)
+        val saltBytes = config.pw_salt.toByteArray(Charsets.UTF_8)
         val md = MessageDigest.getInstance("SHA-512")
         val digest = md.digest(bytes)
-        return hex(digest) == hashedPassword
+        val saltDigest = md.digest(saltBytes)
+        return (hex(saltDigest) + hex(digest)) == hashedPassword
     }
 }
