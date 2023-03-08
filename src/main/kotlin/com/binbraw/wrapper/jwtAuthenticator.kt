@@ -12,6 +12,10 @@ suspend fun PipelineContext<Unit, ApplicationCall>.jwtAuthenticator(apiCall: sus
         val uid = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
         apiCall(uid)
     }catch (e:Exception){
-        call.respond(HttpStatusCode.Unauthorized, "Token has been expired, try to re-login")
+        sendGeneralResponse<Any>(
+            success = false,
+            message = "Unauthorized, Please re-login with correct credentials",
+            code = HttpStatusCode.Unauthorized
+        )
     }
 }

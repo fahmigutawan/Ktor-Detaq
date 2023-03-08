@@ -4,13 +4,14 @@ import com.binbraw.model.base.MetaResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterResponse(
+data class LoginResponse(
     val meta:MetaResponse,
-    val data:RegisterResponseData
+    val data:LoginResponseData
 )
 
 @Serializable
-data class RegisterResponseData(
+data class LoginResponseData(
+    val name:String,
     val email:String,
     val token:String
 )

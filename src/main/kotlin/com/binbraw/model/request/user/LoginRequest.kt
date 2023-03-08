@@ -3,9 +3,7 @@ package com.binbraw.model.request.user
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterRequest(
+data class LoginRequest(
     val email:String,
-    val password:String,
-    val name:String,
-    val role_id:Int
+    val password:String
 )

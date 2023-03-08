@@ -1,13 +1,23 @@
 package com.binbraw.data.api.user
 
 import com.binbraw.data.table.user.UserTable
+import com.binbraw.model.base.MetaResponse
+import com.binbraw.model.request.user.LoginRequest
 import com.binbraw.model.request.user.RegisterRequest
+import com.binbraw.model.response.user.LoginResponse
+import com.binbraw.model.response.user.LoginResponseData
+import com.binbraw.model.response.user.RegisterResponse
+import com.binbraw.model.response.user.RegisterResponseData
 import com.binbraw.util.PasswordManager
+import com.binbraw.util.TokenManager
+import com.binbraw.wrapper.jwtAuthenticator
+import com.binbraw.wrapper.sendGeneralResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.selects.select
 import org.jetbrains.exposed.sql.exposedLogger
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -23,30 +33,99 @@ object UserApi : KoinComponent {
     fun Route.register() {
         post("/register") {
             val body = call.receive<RegisterRequest>()
-            exposedLogger.error(body.toString())
 
             //Check if email has been used
             transaction { userTable.select { userTable.email eq (body.email ?: "") }.count() }
                 .let {
                     if (it > 0) {
-                        call.respond(HttpStatusCode.Conflict, "Email has been used, try another email")
+                        sendGeneralResponse<Any>(
+                            success = false,
+                            message = "Email has been used. Try another email",
+                            code = HttpStatusCode.Conflict
+                        )
                         return@post
-                    }else{
-                        transaction {
-                            userTable.insert {
-                                userTable.run {
-                                    it[uid]= UUID.randomUUID()
-                                    it[email]=body.email ?: ""
-                                    it[password]= passwordManager.hashPassword(body.password ?: "")
-                                    it[name]=body.name ?: ""
-                                    it[role_id]=body.role_id ?: 1
-                                }
-                            }
-                        }.let {
-                            call.respond(HttpStatusCode.OK, "Berhasil")
-                        }
                     }
                 }
+
+            //Register flow
+            val hashedPw = passwordManager.hashPassword(body.password ?: "")
+            val randomizedUid = UUID.randomUUID()
+            transaction {
+                userTable.insert {
+                    userTable.run {
+                        it[uid] = randomizedUid
+                        it[email] = body.email ?: ""
+                        it[password] = hashedPw
+                        it[name] = body.name ?: ""
+                        it[role_id] = body.role_id ?: 1
+                    }
+                }
+            }.let {
+                val token = TokenManager.generateJwtToken(randomizedUid.toString())
+                call.respond(
+                    HttpStatusCode.OK,
+                    RegisterResponse(
+                        meta = MetaResponse(
+                            success = true,
+                            message = "User successfully registered"
+                        ),
+                        data = RegisterResponseData(
+                            email = body.email ?: "",
+                            token = token
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    fun Route.login() {
+        post("/login") {
+            val body = call.receive<LoginRequest>()
+
+            //Check if email has been used
+            transaction { userTable.select { userTable.email eq (body.email) }.count() }
+                .let {
+                    if (it < 1) {
+                        sendGeneralResponse<Any>(
+                            success = false,
+                            message = "Email has not been registered. Try to register first",
+                            code = HttpStatusCode.Conflict
+                        )
+                        return@post
+                    }
+                }
+
+            //Get user data by email and check the password
+            transaction {
+                userTable.select {
+                    userTable.email eq (body.email)
+                }.firstOrNull()
+            }?.let {
+                if(PasswordManager.checkPassword(body.password, it[userTable.password])){
+                    val token = TokenManager.generateJwtToken(it[userTable.uid].toString())
+                    call.respond(
+                        HttpStatusCode.OK,
+                        LoginResponse(
+                            meta = MetaResponse(
+                                success = true,
+                                message = "Login success"
+                            ),
+                            data = LoginResponseData(
+                                name = it[userTable.name],
+                                email = it[userTable.email],
+                                token = token
+                            )
+                        )
+                    )
+                }else{
+                    sendGeneralResponse<Any>(
+                        success = false,
+                        message = "Password is incorrect, input the correct password",
+                        code = HttpStatusCode.BadRequest
+                    )
+                }
+            }
         }
     }
 }
