@@ -34,6 +34,7 @@ object UserApi : KoinComponent {
         post("/register") {
             val body = call.receive<RegisterRequest>()
 
+            //Check request body
             when {
                 !body.email.contains('@') -> {
                     sendGeneralResponse<Any>(
@@ -89,7 +90,8 @@ object UserApi : KoinComponent {
                         it[role_id] = body.role_id ?: 1
                     }
                 }
-            }.let {
+            }
+                .let {
                 val token = TokenManager.generateJwtToken(randomizedUid.toString())
                 call.respond(
                     HttpStatusCode.OK,
