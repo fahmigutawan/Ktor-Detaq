@@ -34,6 +34,35 @@ object UserApi : KoinComponent {
         post("/register") {
             val body = call.receive<RegisterRequest>()
 
+            when {
+                !body.email.contains('@') -> {
+                    sendGeneralResponse<Any>(
+                        success = false,
+                        message = "Input the correct email format",
+                        code = HttpStatusCode.BadRequest
+                    )
+                    return@post
+                }
+
+                body.name.length > 40 -> {
+                    sendGeneralResponse<Any>(
+                        success = false,
+                        message = "Name must be less than 40 characters",
+                        code = HttpStatusCode.BadRequest
+                    )
+                    return@post
+                }
+
+                body.password.length > 20 -> {
+                    sendGeneralResponse<Any>(
+                        success = false,
+                        message = "Password must be less than 20 characters",
+                        code = HttpStatusCode.BadRequest
+                    )
+                    return@post
+                }
+            }
+
             //Check if email has been used
             transaction { userTable.select { userTable.email eq (body.email ?: "") }.count() }
                 .let {
@@ -102,7 +131,7 @@ object UserApi : KoinComponent {
                     userTable.email eq (body.email)
                 }.firstOrNull()
             }?.let {
-                if(PasswordManager.checkPassword(body.password, it[userTable.password])){
+                if (PasswordManager.checkPassword(body.password, it[userTable.password])) {
                     val token = TokenManager.generateJwtToken(it[userTable.uid].toString())
                     call.respond(
                         HttpStatusCode.OK,
@@ -118,7 +147,7 @@ object UserApi : KoinComponent {
                             )
                         )
                     )
-                }else{
+                } else {
                     sendGeneralResponse<Any>(
                         success = false,
                         message = "Password is incorrect, input the correct password",
