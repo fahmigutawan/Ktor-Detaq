@@ -15,8 +15,7 @@ object TokenManager : KoinComponent {
         .build()
 
     fun generateJwtToken(uid: String) =
-        JWT
-            .create()
+        JWT.create()
             .withIssuer(config.jwt_issuer)
             .withAudience(config.jwt_audience)
             .withClaim("uid", uid)

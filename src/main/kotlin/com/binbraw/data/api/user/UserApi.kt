@@ -30,8 +30,8 @@ object UserApi : KoinComponent {
     val userTable by inject<UserTable>()
     val passwordManager by inject<PasswordManager>()
 
-    fun Route.register() {
-        post("/register") {
+    fun Route.register(path:String) {
+        post(path) {
             val body = call.receive<RegisterRequest>()
 
             //Check request body
@@ -110,8 +110,8 @@ object UserApi : KoinComponent {
         }
     }
 
-    fun Route.login() {
-        post("/login") {
+    fun Route.login(path:String) {
+        post(path) {
             val body = call.receive<LoginRequest>()
 
             //Check if email has been used

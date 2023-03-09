@@ -13,8 +13,8 @@ fun Application.configureRegularRouting() {
             call.respondText("Hello World!")
         }
 
-        register()
-        login()
+        register("/user/register")
+        login("/user/login")
     }
 }
 
