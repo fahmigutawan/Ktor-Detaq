@@ -1,5 +1,8 @@
 package com.binbraw.configuration
 
+import com.binbraw.data.api.general.role.RoleApi.getAllRole
+import com.binbraw.data.api.general.role.RoleApi.getRoleById
+import com.binbraw.data.api.general.role.RoleApi.newRole
 import com.binbraw.data.api.user.UserApi.login
 import com.binbraw.data.api.user.UserApi.register
 import io.ktor.server.routing.*
@@ -15,6 +18,9 @@ fun Application.configureRegularRouting() {
 
         register("/user/register")
         login("/user/login")
+        newRole("/role/new")
+        getAllRole("/role/all")
+        getRoleById("/role/getbyid")
     }
 }
 
