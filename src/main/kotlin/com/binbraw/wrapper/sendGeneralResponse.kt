@@ -23,3 +23,20 @@ suspend fun <T> PipelineContext<Unit, ApplicationCall>.sendGeneralResponse(
         )
     )
 }
+
+suspend fun <T> PipelineContext<Unit, ApplicationCall>.sendGeneralResponseInsideJWT(
+    success:Boolean,
+    message:String,
+    code:HttpStatusCode
+) {
+    call.respond(
+        code,
+        GeneralResponse<T>(
+            meta = MetaResponse(
+                success = success,
+                message = message
+            ),
+            data = null
+        )
+    )
+}

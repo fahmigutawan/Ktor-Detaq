@@ -1,5 +1,7 @@
 package com.binbraw.configuration
 
+import com.binbraw.data.api.emergency_contact.EmContactApi.addNewEmergencyContact
+import com.binbraw.data.api.emergency_contact.EmContactApi.getEmergencyContactByContactId
 import com.binbraw.data.api.general.role.RoleApi.getAllRole
 import com.binbraw.data.api.general.role.RoleApi.getRoleById
 import com.binbraw.data.api.general.role.RoleApi.newRole
@@ -27,7 +29,8 @@ fun Application.configureRegularRouting() {
 fun Application.configureAuthorizedRouting(){
     routing {
         authenticate("jwt-auth") {
-
+            addNewEmergencyContact("/emcontact/new")
+            getEmergencyContactByContactId("/emcontact/bycontactid")
         }
     }
 }
