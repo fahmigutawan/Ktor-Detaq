@@ -4,6 +4,7 @@ import org.jetbrains.exposed.sql.Table
 
 object MedicineReminderTable: Table("medicine_reminder") {
     val reminder_id = uuid("reminder_id")
+    val uid = varchar("uid", 128)
     val med_name = varchar("med_name", 128)
     val med_dosage = varchar("med_dosage", 128)
     val date_start = varchar("date_start", 128)

@@ -7,7 +7,6 @@ import com.binbraw.model.base.MetaResponse
 import com.binbraw.model.request.emergency_contact.NewEmergencyContactRequest
 import com.binbraw.model.response.emergency_contact.AllEmergencyContactResponse
 import com.binbraw.model.response.emergency_contact.SingleEmergencyContactDataResponse
-import com.binbraw.wrapper.jwtAuthenticator
 import com.binbraw.wrapper.sendGeneralResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -31,108 +30,108 @@ object EmContactApi : KoinComponent {
         post(path) {
             val request = call.receive<NewEmergencyContactRequest>()
             var isError = false
-            jwtAuthenticator { s ->
-                transaction {
-                    try {
-                        val randomized_contact_id = UUID.randomUUID()
-                        emContactTable.insert {
-                            emContactTable.run {
-                                it[contact_id] = randomized_contact_id
-                                it[contact] = request.contact
-                                it[name] = request.name
-                            }
-                        }
 
-                        emContactWithPatientTable.insert {
-                            emContactWithPatientTable.run {
-                                it[uid] = s
-                                it[contact_id] = randomized_contact_id.toString()
-                            }
+            val s = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
+
+            transaction {
+                try {
+                    val randomized_contact_id = UUID.randomUUID()
+                    emContactTable.insert {
+                        emContactTable.run {
+                            it[contact_id] = randomized_contact_id
+                            it[contact] = request.contact
+                            it[name] = request.name
                         }
-                    } catch (e: Exception) {
-                        rollback()
-                        isError = true
                     }
-                }
 
-                if (isError) {
-                    sendGeneralResponse<Any>(
-                        success = false,
-                        message = "Something went wrong, try again later",
-                        code = HttpStatusCode.BadRequest
-                    )
-                } else {
-                    sendGeneralResponse<Any>(
-                        success = true,
-                        message = "New emergency contact has been created",
-                        code = HttpStatusCode.OK
-                    )
+                    emContactWithPatientTable.insert {
+                        emContactWithPatientTable.run {
+                            it[uid] = s
+                            it[contact_id] = randomized_contact_id.toString()
+                        }
+                    }
+                } catch (e: Exception) {
+                    rollback()
+                    isError = true
                 }
+            }
+
+            if (isError) {
+                sendGeneralResponse<Any>(
+                    success = false,
+                    message = "Something went wrong, try again later",
+                    code = HttpStatusCode.BadRequest
+                )
+            } else {
+                sendGeneralResponse<Any>(
+                    success = true,
+                    message = "New emergency contact has been created",
+                    code = HttpStatusCode.OK
+                )
             }
         }
     }
 
     fun Route.getAllEmergencyContact(path: String) {
         get(path) {
-            jwtAuthenticator { uid ->
-                val listContactId = transaction {
-                    emContactWithPatientTable.select {
-                        emContactWithPatientTable.uid eq uid
-                    }.mapNotNull {
-                        it[emContactWithPatientTable.contact_id]
-                    }
-                }
+            val uid = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
 
-                val data = transaction {
-                    listContactId.mapNotNull { contact_id ->
-                        emContactTable.select {
-                            emContactTable.contact_id eq UUID.fromString(contact_id)
-                        }.firstOrNull()
-                    }.mapNotNull {
-                        SingleEmergencyContactDataResponse(
-                            contact_id = it[emContactTable.contact_id].toString(),
-                            contact = it[emContactTable.contact],
-                            name = it[emContactTable.name]
-                        )
-                    }
+            val listContactId = transaction {
+                emContactWithPatientTable.select {
+                    emContactWithPatientTable.uid eq uid
+                }.mapNotNull {
+                    it[emContactWithPatientTable.contact_id]
                 }
-
-                call.respond(
-                    HttpStatusCode.OK,
-                    AllEmergencyContactResponse(
-                        meta = MetaResponse(
-                            success = true,
-                            message = "Get all emergency contact success"
-                        ),
-                        data = data
-                    )
-                )
             }
+
+            val data = transaction {
+                listContactId.mapNotNull { contact_id ->
+                    emContactTable.select {
+                        emContactTable.contact_id eq UUID.fromString(contact_id)
+                    }.firstOrNull()
+                }.mapNotNull {
+                    SingleEmergencyContactDataResponse(
+                        contact_id = it[emContactTable.contact_id].toString(),
+                        contact = it[emContactTable.contact],
+                        name = it[emContactTable.name]
+                    )
+                }
+            }
+
+            call.respond(
+                HttpStatusCode.OK,
+                AllEmergencyContactResponse(
+                    meta = MetaResponse(
+                        success = true,
+                        message = "Get all emergency contact success"
+                    ),
+                    data = data
+                )
+            )
         }
     }
 
     fun Route.getEmergencyContactByContactId(path: String) {
         get(path) {
-            jwtAuthenticator { s ->
-                val contact_id = call.request.queryParameters["contact_id"]
+            val contact_id = call.request.queryParameters["contact_id"]
+            val s = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
 
-                if (contact_id == null) {
-                    sendGeneralResponse<Any>(
-                        success = false,
-                        message = "Input the correct contact id",
-                        code = HttpStatusCode.BadRequest
-                    )
-                    return@jwtAuthenticator
-                }
+            if (contact_id == null) {
+                sendGeneralResponse<Any>(
+                    success = false,
+                    message = "Input the correct contact id",
+                    code = HttpStatusCode.BadRequest
+                )
+                return@get
+            }
 
-                transaction {
-                    emContactTable.select {
-                        emContactTable.contact_id eq UUID.fromString(contact_id)
-                    }.firstOrNull()
-                }?.let {
-                    val response = it.toEmergencyContact()
-                    call.respond(response)
-                }
+            transaction {
+                emContactTable.select {
+                    emContactTable.contact_id eq UUID.fromString(contact_id)
+                }.firstOrNull()
+            }?.let {
+                val response = it.toEmergencyContact()
+                call.respond(response)
             }
         }
     }
