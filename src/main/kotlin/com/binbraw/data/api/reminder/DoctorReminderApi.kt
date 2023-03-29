@@ -6,6 +6,7 @@ import com.binbraw.model.request.reminder.doctor_reminder.AddNewDoctorReminderRe
 import com.binbraw.model.response.reminder.doctor_reminder.AllDoctorReminderResponse
 import com.binbraw.model.response.reminder.doctor_reminder.SingleDoctorReminderDataResponse
 import com.binbraw.wrapper.sendGeneralResponse
+import com.binbraw.wrapper.sendGeneralResponseWithId
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -39,10 +40,11 @@ object DoctorReminderApi:KoinComponent {
                     it[docReminderTable.uid] = uid
                 }
             }.let {
-                sendGeneralResponse<Any>(
+                sendGeneralResponseWithId(
                     success = true,
                     message = "Add new doctor reminder success",
-                    code = HttpStatusCode.OK
+                    code = HttpStatusCode.OK,
+                    idRelated = randomizedUid.toString()
                 )
             }
         }

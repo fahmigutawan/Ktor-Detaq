@@ -2,6 +2,8 @@ package com.binbraw.wrapper
 
 import com.binbraw.model.base.GeneralResponse
 import com.binbraw.model.base.MetaResponse
+import com.binbraw.model.base.GeneralResponseWithId
+import com.binbraw.model.base.GeneralResponseWithIdData
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -24,19 +26,22 @@ suspend fun <T> PipelineContext<Unit, ApplicationCall>.sendGeneralResponse(
     )
 }
 
-suspend fun <T> PipelineContext<Unit, ApplicationCall>.sendGeneralResponseInsideJWT(
+suspend fun PipelineContext<Unit, ApplicationCall>.sendGeneralResponseWithId(
     success:Boolean,
     message:String,
-    code:HttpStatusCode
+    code:HttpStatusCode,
+    idRelated:String
 ) {
     call.respond(
         code,
-        GeneralResponse<T>(
+        GeneralResponseWithId(
             meta = MetaResponse(
                 success = success,
                 message = message
             ),
-            data = null
+            data = GeneralResponseWithIdData(
+                created_id_related = idRelated
+            )
         )
     )
 }
