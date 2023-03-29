@@ -25,7 +25,11 @@ object TokenManager : KoinComponent {
         verifier(verifier)
         realm = config.jwt_realm
         validate { cred ->
-            JWTPrincipal(cred.payload)
+            if(cred.payload.getClaim("uid").asString() != ""){
+                JWTPrincipal(cred.payload)
+            }else{
+                null
+            }
         }
     }
 }

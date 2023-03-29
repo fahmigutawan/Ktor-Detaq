@@ -3,11 +3,16 @@ package com.binbraw.data.api.emergency_contact
 import com.binbraw.data.table.emergency_contact.EmContactTable
 import com.binbraw.data.table.emergency_contact.EmContactTable.toEmergencyContact
 import com.binbraw.data.table.emergency_contact.EmContactWithPatientTable
+import com.binbraw.model.base.MetaResponse
 import com.binbraw.model.request.emergency_contact.NewEmergencyContactRequest
+import com.binbraw.model.response.emergency_contact.AllEmergencyContactResponse
+import com.binbraw.model.response.emergency_contact.SingleEmergencyContactDataResponse
 import com.binbraw.wrapper.jwtAuthenticator
 import com.binbraw.wrapper.sendGeneralResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -50,13 +55,13 @@ object EmContactApi : KoinComponent {
                     }
                 }
 
-                if(isError){
+                if (isError) {
                     sendGeneralResponse<Any>(
                         success = false,
                         message = "Something went wrong, try again later",
                         code = HttpStatusCode.BadRequest
                     )
-                }else{
+                } else {
                     sendGeneralResponse<Any>(
                         success = true,
                         message = "New emergency contact has been created",
@@ -69,28 +74,39 @@ object EmContactApi : KoinComponent {
 
     fun Route.getAllEmergencyContact(path: String) {
         get(path) {
-            jwtAuthenticator { s ->
-                val page = call.request.queryParameters["page"]?.toIntOrNull()
-
-                when {
-                    (page == null) -> {
-                        sendGeneralResponse<Any>(
-                            success = false,
-                            message = "Input the correct page",
-                            code = HttpStatusCode.BadRequest
-                        )
-                        return@jwtAuthenticator
-                    }
-
-                    (page < 1) -> {
-                        sendGeneralResponse<Any>(
-                            success = false,
-                            message = "Page must be started with 1",
-                            code = HttpStatusCode.BadRequest
-                        )
-                        return@jwtAuthenticator
+            jwtAuthenticator { uid ->
+                val listContactId = transaction {
+                    emContactWithPatientTable.select {
+                        emContactWithPatientTable.uid eq uid
+                    }.mapNotNull {
+                        it[emContactWithPatientTable.contact_id]
                     }
                 }
+
+                val data = transaction {
+                    listContactId.mapNotNull { contact_id ->
+                        emContactTable.select {
+                            emContactTable.contact_id eq UUID.fromString(contact_id)
+                        }.firstOrNull()
+                    }.mapNotNull {
+                        SingleEmergencyContactDataResponse(
+                            contact_id = it[emContactTable.contact_id].toString(),
+                            contact = it[emContactTable.contact],
+                            name = it[emContactTable.name]
+                        )
+                    }
+                }
+
+                call.respond(
+                    HttpStatusCode.OK,
+                    AllEmergencyContactResponse(
+                        meta = MetaResponse(
+                            success = true,
+                            message = "Get all emergency contact success"
+                        ),
+                        data = data
+                    )
+                )
             }
         }
     }
