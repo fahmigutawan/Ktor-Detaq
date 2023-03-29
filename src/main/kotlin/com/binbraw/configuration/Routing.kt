@@ -7,6 +7,7 @@ import com.binbraw.data.api.general.role.RoleApi.getAllRole
 import com.binbraw.data.api.general.role.RoleApi.getRoleById
 import com.binbraw.data.api.general.role.RoleApi.newRole
 import com.binbraw.data.api.reminder.MedicineReminderApi.addNewMedicineReminder
+import com.binbraw.data.api.reminder.MedicineReminderApi.getAllMedicineReminder
 import com.binbraw.data.api.user.UserApi.login
 import com.binbraw.data.api.user.UserApi.register
 import io.ktor.server.routing.*
@@ -35,6 +36,7 @@ fun Application.configureAuthorizedRouting(){
             getEmergencyContactByContactId("/emcontact/bycontactid")
             getAllEmergencyContact("/emcontact/allemcontact")
             addNewMedicineReminder("/med_reminder/add")
+            getAllMedicineReminder("/med_reminder/all")
         }
     }
 }
