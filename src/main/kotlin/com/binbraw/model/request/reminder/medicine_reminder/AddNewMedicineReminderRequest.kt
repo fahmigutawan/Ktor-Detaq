@@ -1,4 +1,4 @@
-package com.binbraw.model.request.medicine_reminder
+package com.binbraw.model.request.reminder.medicine_reminder
 
 import kotlinx.serialization.Serializable
 

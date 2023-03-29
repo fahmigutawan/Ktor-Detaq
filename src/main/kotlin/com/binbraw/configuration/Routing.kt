@@ -6,6 +6,8 @@ import com.binbraw.data.api.emergency_contact.EmContactApi.getEmergencyContactBy
 import com.binbraw.data.api.general.role.RoleApi.getAllRole
 import com.binbraw.data.api.general.role.RoleApi.getRoleById
 import com.binbraw.data.api.general.role.RoleApi.newRole
+import com.binbraw.data.api.reminder.DoctorReminderApi.addNewDoctorReminder
+import com.binbraw.data.api.reminder.DoctorReminderApi.getAllDoctorReminder
 import com.binbraw.data.api.reminder.MedicineReminderApi.addNewMedicineReminder
 import com.binbraw.data.api.reminder.MedicineReminderApi.getAllMedicineReminder
 import com.binbraw.data.api.user.UserApi.login
@@ -37,6 +39,8 @@ fun Application.configureAuthorizedRouting(){
             getAllEmergencyContact("/emcontact/allemcontact")
             addNewMedicineReminder("/med_reminder/add")
             getAllMedicineReminder("/med_reminder/all")
+            addNewDoctorReminder("/doc_reminder/add")
+            getAllDoctorReminder("/doc_reminder/all")
         }
     }
 }

@@ -2,10 +2,9 @@ package com.binbraw.data.api.reminder
 
 import com.binbraw.data.table.reminder.MedicineReminderTable
 import com.binbraw.model.base.MetaResponse
-import com.binbraw.model.request.medicine_reminder.AddNewMedicineReminderRequest
-import com.binbraw.model.response.emergency_contact.SingleEmergencyContactDataResponse
-import com.binbraw.model.response.medicine_reminder.AllMedicineReminderResponse
-import com.binbraw.model.response.medicine_reminder.SingleReminderDataResponse
+import com.binbraw.model.request.reminder.medicine_reminder.AddNewMedicineReminderRequest
+import com.binbraw.model.response.reminder.medicine_reminder.AllMedicineReminderResponse
+import com.binbraw.model.response.reminder.medicine_reminder.SingleMedicineReminderDataResponse
 import com.binbraw.wrapper.sendGeneralResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -63,7 +62,7 @@ object MedicineReminderApi : KoinComponent {
                         medReminderTable.select {
                             medReminderTable.uid eq uid
                         }.mapNotNull {
-                            SingleReminderDataResponse(
+                            SingleMedicineReminderDataResponse(
                                 reminder_id  = it[medReminderTable.reminder_id].toString(),
                                 medicine_name = it[medReminderTable.med_name],
                                 medicine_dosage = it[medReminderTable.med_dosage],

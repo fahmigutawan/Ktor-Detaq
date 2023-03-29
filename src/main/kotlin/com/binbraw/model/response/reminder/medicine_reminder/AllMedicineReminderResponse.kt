@@ -1,4 +1,4 @@
-package com.binbraw.model.response.medicine_reminder
+package com.binbraw.model.response.reminder.medicine_reminder
 
 import com.binbraw.model.base.MetaResponse
 import kotlinx.serialization.Serializable
@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AllMedicineReminderResponse(
     val meta:MetaResponse,
-    val data:List<SingleReminderDataResponse>
+    val data:List<SingleMedicineReminderDataResponse>
 )

@@ -1,9 +1,9 @@
-package com.binbraw.model.response.medicine_reminder
+package com.binbraw.model.response.reminder.medicine_reminder
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SingleReminderDataResponse(
+data class SingleMedicineReminderDataResponse(
     val reminder_id:String,
     val medicine_name:String,
     val medicine_dosage:String,
