@@ -41,6 +41,7 @@ dependencies {
 
     //Json
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-gson:$ktor_version")
 
     //Authentication
@@ -60,4 +61,7 @@ dependencies {
 
     //JDBC
     implementation("org.postgresql:postgresql:$postgresql_version")
+
+    //Client
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
 }

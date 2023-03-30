@@ -3,12 +3,20 @@ package com.binbraw.data.api.emergency_contact
 import com.binbraw.data.table.emergency_contact.EmContactTable
 import com.binbraw.data.table.emergency_contact.EmContactTable.toEmergencyContact
 import com.binbraw.data.table.emergency_contact.EmContactWithPatientTable
+import com.binbraw.data.table.user.UserTable
 import com.binbraw.model.base.MetaResponse
 import com.binbraw.model.request.emergency_contact.NewEmergencyContactRequest
+import com.binbraw.model.request.emergency_contact.SendWhatsappRequest
+import com.binbraw.model.request.emergency_contact.SendWhatsappRequestAsClient
 import com.binbraw.model.response.emergency_contact.AllEmergencyContactResponse
 import com.binbraw.model.response.emergency_contact.SingleEmergencyContactDataResponse
 import com.binbraw.wrapper.sendGeneralResponse
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.serialization.gson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -25,6 +33,7 @@ import java.util.*
 object EmContactApi : KoinComponent {
     val emContactTable by inject<EmContactTable>()
     val emContactWithPatientTable by inject<EmContactWithPatientTable>()
+    val userTable by inject<UserTable>()
 
     fun Route.addNewEmergencyContact(path: String) {
         post(path) {
@@ -134,5 +143,42 @@ object EmContactApi : KoinComponent {
                 call.respond(response)
             }
         }
+    }
+
+    fun Route.sendWhatsapp(path: String) {
+        post(path) {
+            val receivedBody = call.receive<SendWhatsappRequest>()
+            val uid = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
+            val client = HttpClient(CIO) {
+                install(ContentNegotiation) {
+                    gson()
+                }
+            }
+            val userName = transaction {
+                userTable.select { userTable.uid eq UUID.fromString(uid) }.firstOrNull()
+            }?.let {
+                it[userTable.name]
+            } ?: "Family"
+
+            receivedBody.data.forEach {
+                client.post("https://api.nusasms.com/nusasms_api/1.0/whatsapp/message") {
+                    setBody(
+                        SendWhatsappRequestAsClient(
+                            it,
+                            "$userName's conditions is in danger. Call their family immediately"
+                        )
+                    )
+                    header("Content-Type", "application/json")
+                    header("APIKey", "EA6618CD7B19564268CD3315E04D8058")
+                }
+            }
+
+            sendGeneralResponse<Any>(
+                success = true,
+                message = "Send whatsapp succeeded",
+                code = HttpStatusCode.OK
+            )
+        }
+
     }
 }

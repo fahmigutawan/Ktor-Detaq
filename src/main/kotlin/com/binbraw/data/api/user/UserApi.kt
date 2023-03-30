@@ -1,18 +1,18 @@
 package com.binbraw.data.api.user
 
+import com.binbraw.data.table.general.role.RoleTable
 import com.binbraw.data.table.user.UserTable
 import com.binbraw.model.base.MetaResponse
 import com.binbraw.model.request.user.LoginRequest
 import com.binbraw.model.request.user.RegisterRequest
-import com.binbraw.model.response.user.LoginResponse
-import com.binbraw.model.response.user.LoginResponseData
-import com.binbraw.model.response.user.RegisterResponse
-import com.binbraw.model.response.user.RegisterResponseData
+import com.binbraw.model.response.user.*
 import com.binbraw.util.PasswordManager
 import com.binbraw.util.TokenManager
 import com.binbraw.wrapper.sendGeneralResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -25,6 +25,7 @@ import java.util.*
 
 object UserApi : KoinComponent {
     val userTable by inject<UserTable>()
+    val roleTable by inject<RoleTable>()
     val passwordManager by inject<PasswordManager>()
 
     fun Route.register(path:String) {
@@ -153,6 +154,57 @@ object UserApi : KoinComponent {
                         code = HttpStatusCode.BadRequest
                     )
                 }
+            }
+        }
+    }
+
+    fun Route.getMyOwnUserInfo(path:String){
+        get(path){
+            val uid = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
+
+            val role_id = transaction {
+                userTable.select {
+                    userTable.uid eq UUID.fromString(uid)
+                }.firstOrNull()
+            }?.let {
+                it[userTable.role_id]
+            }
+
+            val role_name = transaction {
+                roleTable.select {
+                    roleTable.role_id eq (role_id ?: 2)
+                }.firstOrNull()
+            }?.let {
+                it[roleTable.role_name]
+            }
+
+            try{
+                call.respond(
+                    HttpStatusCode.OK,
+                    message = transaction {
+                        userTable.select {
+                            userTable.uid eq UUID.fromString(uid)
+                        }.mapNotNull {
+                            UserResponse(
+                                meta = MetaResponse(
+                                    success = true,
+                                    message = "Get user success"
+                                ),
+                                data = UserDataResponse(
+                                    email = it[userTable.email],
+                                    name = it[userTable.name],
+                                    role_name = role_name ?: ""
+                                )
+                            )
+                        }[0]
+                    }
+                )
+            }catch (e:Exception){
+                sendGeneralResponse<Any>(
+                    success = false,
+                    message = "Get user failed by some reason",
+                    code = HttpStatusCode.OK
+                )
             }
         }
     }

@@ -25,9 +25,7 @@ object UserTable : Table("user") {
         data = UserDataResponse(
             email = this[email],
             name = this[name],
-            role_name = role_name,
-            created_at = this[created_at],
-            modified_at = this[modified_at]
+            role_name = role_name
         )
     )
 }

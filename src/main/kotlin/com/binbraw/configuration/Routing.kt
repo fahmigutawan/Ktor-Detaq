@@ -10,6 +10,7 @@ import com.binbraw.data.api.reminder.DoctorReminderApi.addNewDoctorReminder
 import com.binbraw.data.api.reminder.DoctorReminderApi.getAllDoctorReminder
 import com.binbraw.data.api.reminder.MedicineReminderApi.addNewMedicineReminder
 import com.binbraw.data.api.reminder.MedicineReminderApi.getAllMedicineReminder
+import com.binbraw.data.api.user.UserApi.getMyOwnUserInfo
 import com.binbraw.data.api.user.UserApi.login
 import com.binbraw.data.api.user.UserApi.register
 import io.ktor.server.routing.*
@@ -34,6 +35,7 @@ fun Application.configureRegularRouting() {
 fun Application.configureAuthorizedRouting(){
     routing {
         authenticate("jwt-auth") {
+            getMyOwnUserInfo("/user/myuser")
             addNewEmergencyContact("/emcontact/new")
             getEmergencyContactByContactId("/emcontact/bycontactid")
             getAllEmergencyContact("/emcontact/allemcontact")

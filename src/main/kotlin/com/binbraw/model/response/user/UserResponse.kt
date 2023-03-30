@@ -13,7 +13,5 @@ data class UserResponse(
 data class UserDataResponse(
     val email:String,
     val name:String,
-    val role_name:String,
-    val created_at:String,
-    val modified_at:String?
+    val role_name:String
 )
