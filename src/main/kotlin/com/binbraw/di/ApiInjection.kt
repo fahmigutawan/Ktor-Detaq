@@ -1,6 +1,7 @@
 package com.binbraw.di
 
 import com.binbraw.data.api.emergency_contact.EmContactApi
+import com.binbraw.data.api.family.PatientWithFamilyApi
 import com.binbraw.data.api.user.UserApi
 import com.binbraw.data.api.general.role.RoleApi
 import com.binbraw.data.api.reminder.DoctorReminderApi
@@ -14,5 +15,6 @@ object ApiInjection {
         single { EmContactApi }
         single { MedicineReminderApi }
         single { DoctorReminderApi }
+        single {PatientWithFamilyApi}
     }
 }
