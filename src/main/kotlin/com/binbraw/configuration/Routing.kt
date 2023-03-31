@@ -46,7 +46,7 @@ fun Application.configureAuthorizedRouting(){
             addNewDoctorReminder("/doc_reminder/add")
             getAllDoctorReminder("/doc_reminder/all")
             addNewFamily("/family/add")
-            updateFcmToken("/fcmtoken/update")
+            updateFcmToken("/fcm/update")
         }
     }
 }

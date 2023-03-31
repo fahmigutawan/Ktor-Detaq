@@ -38,4 +38,8 @@ object FcmTokenApi: KoinComponent {
             }
         }
     }
+
+    fun Route.sendPushNotification(path:String){
+
+    }
 }
