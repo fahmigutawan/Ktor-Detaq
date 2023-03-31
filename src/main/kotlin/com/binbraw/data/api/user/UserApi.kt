@@ -1,6 +1,6 @@
 package com.binbraw.data.api.user
 
-import com.binbraw.data.table.fcm_token.FcmTokenTable
+import com.binbraw.data.table.fcm.FcmTokenTable
 import com.binbraw.data.table.general.role.RoleTable
 import com.binbraw.data.table.user.UserTable
 import com.binbraw.model.base.MetaResponse
