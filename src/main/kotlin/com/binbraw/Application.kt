@@ -23,8 +23,7 @@ fun main() {
 
     embeddedServer(
         Netty,
-        port = config.port,
-        host = config.host
+        port = config.port
     ) {
         module {
             install(Koin) {
