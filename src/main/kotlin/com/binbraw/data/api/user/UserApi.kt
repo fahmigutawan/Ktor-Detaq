@@ -1,5 +1,6 @@
 package com.binbraw.data.api.user
 
+import com.binbraw.data.table.fcm_token.FcmTokenTable
 import com.binbraw.data.table.general.role.RoleTable
 import com.binbraw.data.table.user.UserTable
 import com.binbraw.model.base.MetaResponse
@@ -26,9 +27,10 @@ import java.util.*
 object UserApi : KoinComponent {
     val userTable by inject<UserTable>()
     val roleTable by inject<RoleTable>()
+    val fcmTokenTable by inject<FcmTokenTable>()
     val passwordManager by inject<PasswordManager>()
 
-    fun Route.register(path:String) {
+    fun Route.register(path: String) {
         post(path) {
             val body = call.receive<RegisterRequest>()
 
@@ -88,27 +90,33 @@ object UserApi : KoinComponent {
                         it[role_id] = body.role_id ?: 1
                     }
                 }
-            }
-                .let {
-                val token = TokenManager.generateJwtToken(randomizedUid.toString())
-                call.respond(
-                    HttpStatusCode.OK,
-                    RegisterResponse(
-                        meta = MetaResponse(
-                            success = true,
-                            message = "User successfully registered"
-                        ),
-                        data = RegisterResponseData(
-                            email = body.email ?: "",
-                            token = token
+            }.let {
+                transaction {
+                    fcmTokenTable.insert {
+                        it[fcmTokenTable.uid] = randomizedUid
+                        it[fcmTokenTable.token] = ""
+                    }
+                }.let {
+                    val token = TokenManager.generateJwtToken(randomizedUid.toString())
+                    call.respond(
+                        HttpStatusCode.OK,
+                        RegisterResponse(
+                            meta = MetaResponse(
+                                success = true,
+                                message = "User successfully registered"
+                            ),
+                            data = RegisterResponseData(
+                                email = body.email ?: "",
+                                token = token
+                            )
                         )
                     )
-                )
+                }
             }
         }
     }
 
-    fun Route.login(path:String) {
+    fun Route.login(path: String) {
         post(path) {
             val body = call.receive<LoginRequest>()
 
@@ -158,8 +166,8 @@ object UserApi : KoinComponent {
         }
     }
 
-    fun Route.getMyOwnUserInfo(path:String){
-        get(path){
+    fun Route.getMyOwnUserInfo(path: String) {
+        get(path) {
             val uid = call.principal<JWTPrincipal>()!!.payload.getClaim("uid").asString()
 
             val role_id = transaction {
@@ -178,7 +186,7 @@ object UserApi : KoinComponent {
                 it[roleTable.role_name]
             }
 
-            try{
+            try {
                 call.respond(
                     HttpStatusCode.OK,
                     message = transaction {
@@ -199,7 +207,7 @@ object UserApi : KoinComponent {
                         }[0]
                     }
                 )
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 sendGeneralResponse<Any>(
                     success = false,
                     message = "Get user failed by some reason",

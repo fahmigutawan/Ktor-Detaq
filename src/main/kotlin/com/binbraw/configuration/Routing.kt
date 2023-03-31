@@ -4,6 +4,7 @@ import com.binbraw.data.api.emergency_contact.EmContactApi.addNewEmergencyContac
 import com.binbraw.data.api.emergency_contact.EmContactApi.getAllEmergencyContact
 import com.binbraw.data.api.emergency_contact.EmContactApi.getEmergencyContactByContactId
 import com.binbraw.data.api.family.PatientWithFamilyApi.addNewFamily
+import com.binbraw.data.api.fcm_token.FcmTokenApi.updateFcmToken
 import com.binbraw.data.api.general.role.RoleApi.getAllRole
 import com.binbraw.data.api.general.role.RoleApi.getRoleById
 import com.binbraw.data.api.general.role.RoleApi.newRole
@@ -45,6 +46,7 @@ fun Application.configureAuthorizedRouting(){
             addNewDoctorReminder("/doc_reminder/add")
             getAllDoctorReminder("/doc_reminder/all")
             addNewFamily("/family/add")
+            updateFcmToken("/fcmtoken/update")
         }
     }
 }
