@@ -22,7 +22,8 @@ fun getConfig(
             jwt_issuer = System.getenv("JWT_ISSUER"),
             jwt_realm = System.getenv("JWT_REALM"),
             jwt_secret = System.getenv("JWT_SECRET"),
-            pw_salt = System.getenv("PW_SALT")
+            pw_salt = System.getenv("PW_SALT"),
+            fcm_access_key = System.getenv("FCM_SERVER_KEY")
         )
     }catch (e:Exception){
         Config(
@@ -35,7 +36,8 @@ fun getConfig(
             jwt_issuer = defaultHoconEnv.property("JWT_ISSUER").getString(),
             jwt_realm = defaultHoconEnv.property("JWT_REALM").getString(),
             jwt_secret = defaultHoconEnv.property("JWT_SECRET").getString(),
-            pw_salt = defaultHoconEnv.property("PW_SALT").getString()
+            pw_salt = defaultHoconEnv.property("PW_SALT").getString(),
+            fcm_access_key = defaultHoconEnv.property("FCM_SERVER_KEY").getString()
         )
     }
 }

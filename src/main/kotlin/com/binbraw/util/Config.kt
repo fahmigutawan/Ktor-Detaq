@@ -10,5 +10,6 @@ data class Config(
     val jwt_issuer:String,
     val jwt_audience:String,
     val jwt_realm:String,
-    val pw_salt:String
+    val pw_salt:String,
+    val fcm_access_key:String
 )
