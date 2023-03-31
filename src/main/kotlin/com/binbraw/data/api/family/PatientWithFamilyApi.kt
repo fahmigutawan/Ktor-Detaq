@@ -64,6 +64,23 @@ object PatientWithFamilyApi : KoinComponent {
                 return@get
             }
 
+            val availableFamily = transaction {
+                patientWithFamilyTable.select {
+                    patientWithFamilyTable.patient_id eq UUID.fromString(uid)
+                }.mapNotNull {
+                    it[patientWithFamilyTable.family_id]
+                }
+            }
+
+            if(availableFamily.contains(family_id)){
+                sendGeneralResponse<Any>(
+                    success = false,
+                    message = "Account has been on your family list before.",
+                    code = HttpStatusCode.BadRequest
+                )
+                return@get
+            }
+
             transaction {
                 patientWithFamilyTable.insert {
                     it[patientWithFamilyTable.patient_id] = UUID.fromString(uid)
